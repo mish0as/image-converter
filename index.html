@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -779,7 +780,7 @@ optgroup option {
       <label class="upload-label" for="fileInput">
         <i class="fas fa-plus"></i> Select Images
       </label>
-      <input type="file" id="fileInput" multiple accept="image/*" />
+      <input type="file" id="fileInput" multiple accept="image/*,.svg" />
       <div class="file-info" id="fileInfo">No files selected</div>
     </div>
 
@@ -797,6 +798,7 @@ optgroup option {
           <option value="tiff">TIFF</option>
           <option value="gif">GIF</option>
           <option value="ico">ICO</option>
+          <option value="svg">SVG</option>
         </select>
       </div>
 
@@ -843,10 +845,11 @@ optgroup option {
     </div>
   </div>
 
-  <script>
+<script>
     let files = [];
     let convertedFiles = [];
     const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+    const MAX_DIMENSION = 4000; // Target size for the larger dimension
 
     // DOM elements
     const fileInput = document.getElementById("fileInput");
@@ -949,51 +952,136 @@ optgroup option {
       files.forEach((file, index) => {
         const reader = new FileReader();
         reader.onload = function(e) {
-          const img = new Image();
-          img.onload = function() {
-            const card = createPreviewCard(file, e.target.result, img.width, img.height, index);
-            previewArea.appendChild(card);
-          };
-          img.src = e.target.result;
+          if (file.type === "image/svg+xml" || file.name.endsWith('.svg')) {
+            // Handle SVG files differently
+            const svgPreview = createSvgPreviewCard(file, e.target.result, index);
+            previewArea.appendChild(svgPreview);
+          } else {
+            // Handle raster images
+            const img = new Image();
+            img.onload = function() {
+              const card = createPreviewCard(file, e.target.result, img.width, img.height, index);
+              previewArea.appendChild(card);
+            };
+            img.onerror = function() {
+              // If image fails to load, show a placeholder
+              const card = createErrorCard(file, index);
+              previewArea.appendChild(card);
+            };
+            img.src = e.target.result;
+          }
+        };
+        reader.onerror = function() {
+          // If file can't be read, show error card
+          const card = createErrorCard(file, index);
+          previewArea.appendChild(card);
         };
         reader.readAsDataURL(file);
       });
     }
 
-function createPreviewCard(file, dataUrl, width, height, index) {
-  const card = document.createElement("div");
-  card.className = "preview-card";
-  card.dataset.index = index;
-  
-  // Get file extension
-  const fileExt = file.name.split('.').pop().toLowerCase();
-  
-  card.innerHTML = `
-    <div class="preview-img-container">
-      <img src="${dataUrl}" alt="${file.name}" />
-      <span class="file-format-badge">${fileExt}</span>
-    </div>
-    <div class="file-meta">
-      <span><strong>${file.name}</strong></span>
-      <span>${(file.size / 1024).toFixed(2)} KB</span>
-      <span>${width} × ${height} px</span>
-    </div>
-    <div class="file-actions">
-      <button class="remove-btn">
-        <i class="fas fa-times"></i> Remove
-      </button>
-      <button class="convert-btn">
-        <i class="fas fa-magic"></i> Convert
-      </button>
-    </div>
-  `;
-  
-  // Add event listeners to the buttons
-  card.querySelector('.remove-btn').addEventListener('click', () => removeFile(index));
-  card.querySelector('.convert-btn').addEventListener('click', () => convertSingle(index));
-  
-  return card;
-}
+    function createSvgPreviewCard(file, dataUrl, index) {
+      const card = document.createElement("div");
+      card.className = "preview-card";
+      card.dataset.index = index;
+      
+      card.innerHTML = `
+        <div class="preview-img-container">
+          <img src="${dataUrl}" alt="${file.name}" />
+          <span class="file-format-badge">svg</span>
+        </div>
+        <div class="file-meta">
+          <span><strong>${file.name}</strong></span>
+          <span>${(file.size / 1024).toFixed(2)} KB</span>
+          <span>SVG Vector Image</span>
+        </div>
+        <div class="file-actions">
+          <button class="remove-btn">
+            <i class="fas fa-times"></i> Remove
+          </button>
+          <button class="convert-btn">
+            <i class="fas fa-magic"></i> Convert
+          </button>
+        </div>
+      `;
+      
+      // Add event listeners to the buttons
+      card.querySelector('.remove-btn').addEventListener('click', () => removeFile(index));
+      card.querySelector('.convert-btn').addEventListener('click', () => convertSingle(index));
+      
+      return card;
+    }
+
+    function createPreviewCard(file, dataUrl, width, height, index) {
+      const card = document.createElement("div");
+      card.className = "preview-card";
+      card.dataset.index = index;
+      
+      // Get file extension
+      const fileExt = file.name.split('.').pop().toLowerCase();
+      
+      card.innerHTML = `
+        <div class="preview-img-container">
+          <img src="${dataUrl}" alt="${file.name}" />
+          <span class="file-format-badge">${fileExt}</span>
+        </div>
+        <div class="file-meta">
+          <span><strong>${file.name}</strong></span>
+          <span>${(file.size / 1024).toFixed(2)} KB</span>
+          <span>${width} × ${height} px</span>
+        </div>
+        <div class="file-actions">
+          <button class="remove-btn">
+            <i class="fas fa-times"></i> Remove
+          </button>
+          <button class="convert-btn">
+            <i class="fas fa-magic"></i> Convert
+          </button>
+        </div>
+      `;
+      
+      // Add event listeners to the buttons
+      card.querySelector('.remove-btn').addEventListener('click', () => removeFile(index));
+      card.querySelector('.convert-btn').addEventListener('click', () => convertSingle(index));
+      
+      return card;
+    }
+
+    function createErrorCard(file, index) {
+      const card = document.createElement("div");
+      card.className = "preview-card";
+      card.dataset.index = index;
+      
+      // Get file extension
+      const fileExt = file.name.split('.').pop().toLowerCase();
+      
+      card.innerHTML = `
+        <div class="preview-img-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: var(--danger); margin-bottom: var(--space-sm);"></i>
+          <p style="color: var(--danger); text-align: center;">Unable to preview</p>
+          <span class="file-format-badge">${fileExt}</span>
+        </div>
+        <div class="file-meta">
+          <span><strong>${file.name}</strong></span>
+          <span>${(file.size / 1024).toFixed(2)} KB</span>
+          <span>Unknown dimensions</span>
+        </div>
+        <div class="file-actions">
+          <button class="remove-btn">
+            <i class="fas fa-times"></i> Remove
+          </button>
+          <button class="convert-btn">
+            <i class="fas fa-magic"></i> Convert
+          </button>
+        </div>
+      `;
+      
+      // Add event listeners to the buttons
+      card.querySelector('.remove-btn').addEventListener('click', () => removeFile(index));
+      card.querySelector('.convert-btn').addEventListener('click', () => convertSingle(index));
+      
+      return card;
+    }
 
     function removeFile(index) {
       files.splice(index, 1);
@@ -1104,31 +1192,174 @@ function createPreviewCard(file, dataUrl, width, height, index) {
 
     async function convertImage(file, index, previewOnly = false) {
       return new Promise((resolve, reject) => {
+        try {
+          const format = formatSelect.value;
+          const isSvg = file.type === "image/svg+xml" || file.name.endsWith('.svg');
+          
+          // Special handling for SVG files
+          if (isSvg && format === 'svg') {
+            // If SVG to SVG, just return the original file
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              resolve({
+                dataUrl: e.target.result,
+                filename: file.name,
+                width: 0, // SVG dimensions not easily available
+                height: 0,
+                size: file.size / 1024,
+                format: 'svg'
+              });
+            };
+            reader.readAsDataURL(file);
+            return;
+          }
+          
+          // For SVG to other formats, we need to render it first
+          if (isSvg) {
+            convertSvgToRaster(file, format, previewOnly).then(resolve).catch(reject);
+            return;
+          }
+          
+          // For raster images
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            const img = new Image();
+            img.src = event.target.result;
+            
+            img.onload = function() {
+              try {
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                
+                // Calculate dimensions with maximum quality in mind
+                const naturalWidth = img.naturalWidth || img.width;
+                const naturalHeight = img.naturalHeight || img.height;
+                const aspectRatio = naturalWidth / naturalHeight;
+                
+                let targetWidth, targetHeight;
+                if (aspectRatio >= 1) {
+                  targetWidth = Math.min(naturalWidth, MAX_DIMENSION);
+                  targetHeight = Math.round(targetWidth / aspectRatio);
+                } else {
+                  targetHeight = Math.min(naturalHeight, MAX_DIMENSION);
+                  targetWidth = Math.round(targetHeight * aspectRatio);
+                }
+                
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
+                
+                // Set background for transparent images when converting to JPEG
+                if (format === 'jpeg' || format === 'bmp') {
+                  ctx.fillStyle = 'white';
+                  ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+                
+                // Use highest quality rendering
+                ctx.imageSmoothingQuality = "high";
+                ctx.imageSmoothingEnabled = true;
+                ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+                
+                // Get format and set quality
+                let mimeType = `image/${format}`;
+                
+                // Special cases for some formats
+                if (format === "avif") {
+                  mimeType = "image/avif";
+                } else if (format === "ico") {
+                  mimeType = "image/x-icon";
+                }
+                
+                // Quality settings - always use highest quality
+                let quality;
+                if (format === 'png' || format === 'bmp') {
+                  quality = undefined; // PNG and BMP are lossless
+                } else {
+                  quality = 1.0; // Always use maximum quality (100%)
+                }
+                
+                const dataUrl = canvas.toDataURL(mimeType, quality);
+                const filename = `${file.name.split('.')[0]}.${format}`;
+                
+                // Calculate approximate file size
+                let size;
+                if (previewOnly) {
+                  // For preview, use a more accurate size calculation
+                  size = Math.floor(dataUrl.length * 0.75) / 1024; // Base64 is about 4/3 of raw size
+                } else {
+                  // For actual conversion, this will be close enough
+                  size = dataUrl.length / 1024;
+                }
+                
+                const result = {
+                  dataUrl,
+                  filename,
+                  width: targetWidth,
+                  height: targetHeight,
+                  size,
+                  format
+                };
+                
+                resolve(result);
+              } catch (error) {
+                reject(error);
+              }
+            };
+            
+            img.onerror = function() {
+              reject("Failed to load image");
+            };
+          };
+          
+          reader.onerror = function() {
+            reject("Failed to read file");
+          };
+          
+          reader.readAsDataURL(file);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    }
+
+    function convertSvgToRaster(file, format, previewOnly = false) {
+      return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = function(e) {
+          const svgData = e.target.result;
           const img = new Image();
-          img.src = event.target.result;
           
           img.onload = function() {
             try {
-              const canvas = document.createElement("canvas");
-              const width = img.width;
-              const height = img.height;
+              // Calculate dimensions with maximum quality in mind
+              const naturalWidth = img.naturalWidth || img.width || 1000;
+              const naturalHeight = img.naturalHeight || img.height || 1000;
+              const aspectRatio = naturalWidth / naturalHeight;
               
-              canvas.width = width;
-              canvas.height = height;
+              let targetWidth, targetHeight;
+              if (aspectRatio >= 1) {
+                targetWidth = MAX_DIMENSION;
+                targetHeight = Math.round(MAX_DIMENSION / aspectRatio);
+              } else {
+                targetHeight = MAX_DIMENSION;
+                targetWidth = Math.round(MAX_DIMENSION * aspectRatio);
+              }
+              
+              const canvas = document.createElement("canvas");
+              canvas.width = targetWidth;
+              canvas.height = targetHeight;
               
               const ctx = canvas.getContext("2d");
               
               // Set background for transparent images when converting to JPEG
-              const format = formatSelect.value;
               if (format === 'jpeg' || format === 'bmp') {
                 ctx.fillStyle = 'white';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
               }
               
+              // Use highest quality rendering
               ctx.imageSmoothingQuality = "high";
-              ctx.drawImage(img, 0, 0, width, height);
+              ctx.imageSmoothingEnabled = true;
+              ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
               
               // Get format and set quality
               let mimeType = `image/${format}`;
@@ -1140,7 +1371,8 @@ function createPreviewCard(file, dataUrl, width, height, index) {
                 mimeType = "image/x-icon";
               }
               
-              const quality = format === 'png' || format === 'bmp' ? undefined : (qualityInput.value / 100);
+              // Always use maximum quality (100%)
+              const quality = 1.0;
               
               const dataUrl = canvas.toDataURL(mimeType, quality);
               const filename = `${file.name.split('.')[0]}.${format}`;
@@ -1158,8 +1390,8 @@ function createPreviewCard(file, dataUrl, width, height, index) {
               const result = {
                 dataUrl,
                 filename,
-                width,
-                height,
+                width: targetWidth,
+                height: targetHeight,
                 size,
                 format
               };
@@ -1171,12 +1403,14 @@ function createPreviewCard(file, dataUrl, width, height, index) {
           };
           
           img.onerror = function() {
-            reject("Failed to load image");
+            reject("Failed to render SVG");
           };
+          
+          img.src = svgData;
         };
         
         reader.onerror = function() {
-          reject("Failed to read file");
+          reject("Failed to read SVG file");
         };
         
         reader.readAsDataURL(file);
@@ -1184,45 +1418,45 @@ function createPreviewCard(file, dataUrl, width, height, index) {
     }
 
     function updateConvertedCard(index, convertedData, isPreview = false) {
-  const card = document.querySelector(`.preview-card[data-index="${index}"]`);
-  if (!card) return;
-  
-  card.classList.add("converted-item");
-  
-  const originalSizeKB = files[index].size / 1024;
-  const sizeDiff = ((convertedData.size - originalSizeKB) / originalSizeKB) * 100;
-  const sizeChangeText = sizeDiff < 0 ? 
-    `${Math.abs(sizeDiff).toFixed(1)}% smaller` : 
-    `${sizeDiff.toFixed(1)}% larger`;
-  
-  const actionText = isPreview ? "Preview" : "Converted";
-  
-  card.innerHTML = `
-    <div class="preview-img-container">
-      <img src="${convertedData.dataUrl}" alt="${convertedData.filename}" />
-      <span class="file-format-badge" style="background: ${isPreview ? 'var(--warning)' : 'var(--success)'}; color: var(--bg-primary);">
-        ${convertedData.format}
-      </span>
-    </div>
-    <div class="file-meta">
-      <span><strong>${convertedData.filename}</strong></span>
-      <span>${convertedData.size.toFixed(2)} KB (${sizeChangeText})</span>
-      <span>${convertedData.width} × ${convertedData.height} px</span>
-      <span class="file-status"><i class="fas fa-check-circle"></i> ${actionText} to ${convertedData.format.toUpperCase()}</span>
-    </div>
-    <div class="file-actions">
-      <button class="remove-btn">
-        <i class="fas fa-times"></i> Remove
-      </button>
-      <a class="download-btn" href="${convertedData.dataUrl}" download="${convertedData.filename}">
-        <i class="fas fa-download"></i> Download
-      </a>
-    </div>
-  `;
-  
-  // Add event listener to the remove button
-  card.querySelector('.remove-btn').addEventListener('click', () => removeFile(index));
-}
+      const card = document.querySelector(`.preview-card[data-index="${index}"]`);
+      if (!card) return;
+      
+      card.classList.add("converted-item");
+      
+      const originalSizeKB = files[index].size / 1024;
+      const sizeDiff = ((convertedData.size - originalSizeKB) / originalSizeKB) * 100;
+      const sizeChangeText = sizeDiff < 0 ? 
+        `${Math.abs(sizeDiff).toFixed(1)}% smaller` : 
+        `${sizeDiff.toFixed(1)}% larger`;
+      
+      const actionText = isPreview ? "Preview" : "Converted";
+      
+      card.innerHTML = `
+        <div class="preview-img-container">
+          <img src="${convertedData.dataUrl}" alt="${convertedData.filename}" />
+          <span class="file-format-badge" style="background: ${isPreview ? 'var(--warning)' : 'var(--success)'}; color: var(--bg-primary);">
+            ${convertedData.format}
+          </span>
+        </div>
+        <div class="file-meta">
+          <span><strong>${convertedData.filename}</strong></span>
+          <span>${convertedData.size.toFixed(2)} KB (${sizeChangeText})</span>
+          <span>${convertedData.width} × ${convertedData.height} px</span>
+          <span class="file-status"><i class="fas fa-check-circle"></i> ${actionText} to ${convertedData.format.toUpperCase()}</span>
+        </div>
+        <div class="file-actions">
+          <button class="remove-btn">
+            <i class="fas fa-times"></i> Remove
+          </button>
+          <a class="download-btn" href="${convertedData.dataUrl}" download="${convertedData.filename}">
+            <i class="fas fa-download"></i> Download
+          </a>
+        </div>
+      `;
+      
+      // Add event listener to the remove button
+      card.querySelector('.remove-btn').addEventListener('click', () => removeFile(index));
+    }
 
     function downloadAll() {
       if (convertedFiles.length === 0) {
