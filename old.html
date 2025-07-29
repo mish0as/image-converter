@@ -5,17 +5,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ultimate Image Converter</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #6c5ce7;
-      --primary-light: #a29bfe;
-      --secondary: #00cec9;
-      --dark: #2d3436;
-      --darker: #1e272e;
-      --light: #f5f6fa;
-      --success: #00b894;
-      --warning: #fdcb6e;
-      --danger: #d63031;
+      /* Modern 2025 Color Palette */
+      --primary: #00ff9d;
+      --primary-dark: #00cc7a;
+      --secondary: #6366f1;
+      --secondary-dark: #4f46e5;
+      --accent: #f59e0b;
+      --danger: #ef4444;
+      --success: #10b981;
+      --warning: #f59e0b;
+      
+      /* Sophisticated neutral palette */
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #1a1a1a;
+      --bg-tertiary: #2a2a2a;
+      --bg-glass: rgba(255, 255, 255, 0.03);
+      --bg-glass-hover: rgba(255, 255, 255, 0.08);
+      
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.8);
+      --text-muted: rgba(255, 255, 255, 0.6);
+      
+      --border-primary: rgba(255, 255, 255, 0.1);
+      --border-secondary: rgba(255, 255, 255, 0.05);
+      --border-accent: rgba(0, 255, 157, 0.3);
+      
+      /* Shadows and effects */
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.2);
+      --shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.3);
+      --shadow-glow: 0 0 32px rgba(0, 255, 157, 0.2);
+      --shadow-glow-hover: 0 0 48px rgba(0, 255, 157, 0.3);
+      
+      /* Spacing */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 0.5rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --space-2xl: 3rem;
+      
+      /* Border radius */
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
     }
     
     * { 
@@ -25,25 +63,48 @@
     }
     
     body {
-      font-family: "Segoe UI", "Poppins", sans-serif;
-      background: linear-gradient(135deg, var(--darker), var(--dark));
-      color: var(--light);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      color: var(--text-primary);
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 20px;
+      padding: var(--space-xl);
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* Animated background elements */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 25% 25%, rgba(0, 255, 157, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(0, 184, 255, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+      animation: backgroundShift 20s ease-in-out infinite;
+    }
+    
+    @keyframes backgroundShift {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.05); }
     }
     
     .converter-box {
-      background: rgba(45, 52, 54, 0.8);
-      border-radius: 20px;
-      padding: 40px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(20px);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
       width: 100%;
       max-width: 900px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(15px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-primary);
       animation: fadeIn 0.8s ease;
       position: relative;
       overflow: hidden;
@@ -56,9 +117,14 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: radial-gradient(circle, rgba(108, 92, 231, 0.1) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(0, 255, 157, 0.1) 0%, transparent 70%);
       z-index: -1;
-      animation: rotate 20s linear infinite;
+    }
+        .drop-subtitle {
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+      margin-bottom: var(--space-lg);
+      line-height: 1.5;
     }
     
     @keyframes fadeIn {
@@ -73,51 +139,100 @@
     
     .header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: var(--space-xl);
       position: relative;
+      padding-bottom: var(--space-md);
     }
     
     .header h1 {
-      color: var(--primary-light);
-      margin-bottom: 10px;
-      font-size: 2.5rem;
-      font-weight: 700;
-      letter-spacing: 1px;
+      font-size: clamp(1.875rem, 5vw, 3rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: var(--space-sm);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      position: relative;
+      animation: titleGlow 3s ease-in-out infinite;
+    }
+    
+    @keyframes titleGlow {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(0, 255, 157, 0.3)); }
+      50% { filter: drop-shadow(0 0 30px rgba(0, 255, 157, 0.5)); }
     }
     
     .header p {
-      color: rgba(255, 255, 255, 0.7);
+      color: var(--text-secondary);
       font-size: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
     }
     
     .header::after {
       content: '';
-      display: block;
-      width: 80px;
-      height: 3px;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 4px;
       background: linear-gradient(90deg, var(--primary), var(--secondary));
-      margin: 15px auto 0;
-      border-radius: 3px;
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-glow);
     }
     
-    .upload-section {
-      background: rgba(30, 39, 46, 0.6);
-      border-radius: 15px;
-      padding: 30px;
-      border: 2px dashed rgba(108, 92, 231, 0.3);
-      margin-bottom: 30px;
-      transition: all 0.3s ease;
-      text-align: center;
+.upload-section {
+  position: relative;
+  width: 100%;
+  max-width: 350px; /* Increased from 350px */
+  height: 240px; /* Increased from 200px */
+  border: 2px dashed var(--border-primary);
+  border-radius: var(--radius-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl); /* Adjusted padding */
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  margin: 0 auto var(--space-xl);
+}
+    
+    .upload-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(0, 255, 157, 0.1), rgba(99, 102, 241, 0.1));
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      border-radius: var(--radius-xl);
+    }
+    
+    .upload-section:hover::before,
+    .upload-section.drag-over::before {
+      opacity: 1;
     }
     
     .upload-section:hover {
-      border-color: var(--primary);
-      background: rgba(30, 39, 46, 0.8);
+      border-color: var(--border-accent);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg), var(--shadow-glow);
     }
     
     .upload-section.drag-over {
-      border-color: var(--success);
-      background: rgba(0, 184, 148, 0.1);
+      border-color: var(--primary);
+      background: rgba(0, 255, 157, 0.05);
+      transform: scale(1.02);
     }
     
     input[type="file"] {
@@ -128,35 +243,53 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      background: var(--primary);
-      padding: 15px 30px;
-      border-radius: 10px;
+      gap: var(--space-sm);
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      padding: var(--space-md) var(--space-xl);
+      border-radius: var(--radius-full);
       cursor: pointer;
-      color: white;
+      color: var(--bg-primary);
       font-weight: 600;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       margin: 0 auto;
-      box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+      font-size: 1rem;
+    }
+    
+    label.upload-label::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    label.upload-label:hover::before {
+      left: 100%;
     }
     
     label.upload-label:hover {
-      background: var(--primary-light);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(108, 92, 231, 0.6);
+      box-shadow: var(--shadow-md), var(--shadow-glow);
     }
     
     .file-info {
-      margin-top: 15px;
+      margin-top: var(--space-md);
       font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.7);
+      color: var(--text-muted);
+      line-height: 1.5;
     }
     
     .controls {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin-bottom: 30px;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
     }
     
     .control-group {
@@ -165,112 +298,198 @@
     }
     
     .control-group label {
-      margin-bottom: 8px;
+      margin-bottom: var(--space-sm);
       font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.8);
+      color: var(--text-secondary);
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
     }
     
     select, button, input {
-      padding: 12px 15px;
-      border-radius: 10px;
+      padding: var(--space-md) var(--space-lg);
+      border-radius: var(--radius-md);
       font-size: 1rem;
-      background: rgba(30, 39, 46, 0.8);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--bg-glass);
+      color: var(--text-primary);
+      border: 1px solid var(--border-primary);
       transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
     }
     
-    select {
-      appearance: none;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
-      background-repeat: no-repeat;
-      background-position: right 15px center;
-      background-size: 15px;
-    }
-    
-    select:focus, button:focus, input:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.3);
-    }
+select {
+  appearance: none;
+  background: var(--bg-glass);
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right var(--space-md) center;
+  background-size: 15px;
+  padding-right: var(--space-2xl);
+  cursor: pointer;
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  font-size: 1rem;
+  backdrop-filter: blur(10px);
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 255, 157, 0.1), var(--shadow-glow);
+}
+
+/* Hover state */
+select:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--border-accent);
+}
+
+/* Options styling */
+option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: var(--space-md);
+}
+
+option:hover {
+  background: var(--primary) !important;
+  color: var(--bg-primary) !important;
+}
+
+/* For Firefox */
+select {
+  -moz-appearance: none;
+  text-indent: 1px;
+  text-overflow: '';
+}
+
+/* For IE10+ */
+select::-ms-expand {
+  display: none;
+}
+
+/* Dropdown arrow color for Firefox */
+@-moz-document url-prefix() {
+  select {
+    color: transparent !important;
+    text-shadow: 0 0 0 var(--text-primary);
+  }
+}
+
+/* Modern styling for dropdown when open */
+select:active, select:focus {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-color: var(--primary);
+}
+
+/* Style the dropdown list */
+select option:checked {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: var(--bg-primary);
+}
+
+/* Style for grouped options */
+optgroup {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+optgroup option {
+  padding-left: var(--space-lg);
+}
     
     button {
-      background: var(--primary);
-      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: var(--bg-primary);
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: var(--space-sm);
+      position: relative;
+      overflow: hidden;
     }
     
     button:hover {
-      background: var(--primary-light);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(108, 92, 231, 0.6);
+      box-shadow: var(--shadow-md), var(--shadow-glow);
     }
     
     button.secondary {
-      background: var(--darker);
+      background: var(--bg-glass);
+      color: var(--text-primary);
+      border: 1px solid var(--border-primary);
     }
     
     button.secondary:hover {
-      background: rgba(30, 39, 46, 0.9);
+      background: var(--bg-glass-hover);
+      border-color: var(--border-accent);
     }
     
     button.danger {
       background: var(--danger);
+      color: var(--text-primary);
     }
     
     button.danger:hover {
-      background: #e84343;
+      background: #dc2626;
     }
     
     .action-buttons {
       display: flex;
-      gap: 15px;
-      margin-bottom: 30px;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+      flex-wrap: wrap;
     }
     
     .action-buttons button {
       flex: 1;
+      min-width: 120px;
     }
     
     .preview-area {
-      margin-top: 20px;
+      margin-top: var(--space-lg);
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
+      gap: var(--space-md);
     }
     
     .preview-card {
-      background: rgba(30, 39, 46, 0.6);
-      padding: 20px;
-      border-radius: 15px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      transition: all 0.3s ease;
+      background: var(--bg-glass);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-primary);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       flex-direction: column;
+      backdrop-filter: blur(10px);
     }
     
     .preview-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      box-shadow: var(--shadow-lg);
       border-color: var(--primary);
     }
     
     .preview-img-container {
       position: relative;
       overflow: hidden;
-      border-radius: 10px;
-      margin-bottom: 15px;
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-md);
       flex-grow: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--darker);
+      background: var(--bg-tertiary);
     }
     
     .preview-img-container img {
@@ -285,169 +504,169 @@
     }
     
     .file-meta {
-      margin-bottom: 15px;
+      margin-bottom: var(--space-md);
       font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.6);
+      color: var(--text-muted);
     }
     
     .file-meta span {
       display: block;
       margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     
     .file-actions {
       display: flex;
-      gap: 10px;
+      gap: var(--space-sm);
       margin-top: auto;
     }
     
     .file-actions a, .file-actions button {
       flex: 1;
-      padding: 8px;
+      padding: var(--space-sm);
       font-size: 0.9rem;
       text-align: center;
       text-decoration: none;
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
     }
     
     .download-btn {
       background: var(--success);
-      color: white;
+      color: var(--text-primary);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 5px;
+      transition: all 0.3s ease;
     }
     
     .download-btn:hover {
-      background: #00d4a0;
+      background: #059669;
     }
     
     .remove-btn {
-      background: rgba(214, 48, 49, 0.2);
+      background: rgba(239, 68, 68, 0.2);
       color: var(--danger);
       border: 1px solid var(--danger);
+      transition: all 0.3s ease;
     }
     
     .remove-btn:hover {
-      background: rgba(214, 48, 49, 0.3);
+      background: rgba(239, 68, 68, 0.3);
     }
     
     .batch-actions {
       display: flex;
       justify-content: space-between;
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: var(--space-lg);
+      padding-top: var(--space-lg);
+      border-top: 1px solid var(--border-primary);
+      gap: var(--space-md);
     }
     
     .progress-container {
       width: 100%;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      margin: 20px 0;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-md);
+      margin: var(--space-lg) 0;
       overflow: hidden;
       display: none;
     }
     
     .progress-bar {
-      height: 10px;
+      height: 8px;
       background: linear-gradient(90deg, var(--primary), var(--secondary));
       width: 0%;
       transition: width 0.3s ease;
+      border-radius: var(--radius-md);
     }
     
     .status-message {
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-lg);
       display: none;
       animation: fadeIn 0.5s ease;
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-primary);
     }
     
     .status-message.success {
-      background: rgba(0, 184, 148, 0.2);
-      border: 1px solid var(--success);
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--success);
       color: var(--success);
       display: block;
     }
     
     .status-message.error {
-      background: rgba(214, 48, 49, 0.2);
-      border: 1px solid var(--danger);
+      background: rgba(239, 68, 68, 0.2);
+      border-color: var(--danger);
       color: var(--danger);
       display: block;
     }
     
     .status-message.info {
-      background: rgba(253, 203, 110, 0.2);
-      border: 1px solid var(--warning);
+      background: rgba(245, 158, 11, 0.2);
+      border-color: var(--warning);
       color: var(--warning);
       display: block;
     }
     
     .empty-state {
       text-align: center;
-      padding: 40px 20px;
-      color: rgba(255, 255, 255, 0.5);
+      padding: var(--space-2xl) var(--space-lg);
+      color: var(--text-muted);
+      grid-column: 1 / -1;
     }
     
     .empty-state i {
       font-size: 3rem;
-      margin-bottom: 20px;
+      margin-bottom: var(--space-lg);
       color: rgba(255, 255, 255, 0.2);
     }
     
     .empty-state p {
-      margin-top: 10px;
+      margin-top: var(--space-sm);
     }
     
     .quality-control {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: var(--space-sm);
     }
     
     .quality-control input[type="range"] {
       flex-grow: 1;
       -webkit-appearance: none;
       height: 6px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 3px;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-full);
       outline: none;
     }
     
     .quality-control input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      appearance: none;
       width: 16px;
       height: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
       border-radius: 50%;
-      background: var(--primary);
       cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+    
+    .quality-control input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: var(--shadow-glow);
     }
     
     .quality-value {
       min-width: 40px;
       text-align: center;
-    }
-    
-    @media (max-width: 768px) {
-      .converter-box {
-        padding: 25px;
-      }
-      
-      .controls {
-        grid-template-columns: 1fr;
-      }
-      
-      .action-buttons {
-        flex-direction: column;
-      }
-      
-      .preview-area {
-        grid-template-columns: 1fr;
-      }
+      color: var(--text-primary);
+      font-weight: 600;
     }
     
     /* Animation for converted items */
@@ -460,6 +679,90 @@
     .converted-item {
       animation: popIn 0.5s ease forwards;
     }
+    
+    @media (max-width: 768px) {
+      .converter-box {
+        padding: var(--space-lg);
+      }
+      
+      .controls {
+        grid-template-columns: 1fr;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .action-buttons button {
+        width: 100%;
+      }
+      
+      .preview-area {
+        grid-template-columns: 1fr;
+      }
+      
+      .batch-actions {
+        flex-direction: column;
+      }
+    }
+
+    .file-format-badge {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  background: var(--bg-glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-primary);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.preview-card:hover .file-format-badge {
+  background: var(--primary);
+  color: var(--bg-primary);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-glow);
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.control-group label {
+  margin-bottom: var(--space-sm);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.control-group::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.control-group:focus-within::after {
+  transform: scaleX(1);
+}
+
   </style>
 </head>
 <body>
@@ -470,8 +773,11 @@
     </div>
 
     <div class="upload-section" id="uploadSection">
+      <i class="fas fa-cloud-upload-alt upload-icon" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: var(--space-md);"></i>
+      <h3 class="drop-title">Drop your image here</h3>
+        <p class="drop-subtitle">or click the button below</p>
       <label class="upload-label" for="fileInput">
-        <i class="fas fa-cloud-upload-alt"></i> Select Images
+        <i class="fas fa-plus"></i> Select Images
       </label>
       <input type="file" id="fileInput" multiple accept="image/*" />
       <div class="file-info" id="fileInfo">No files selected</div>
@@ -654,36 +960,40 @@
       });
     }
 
-    function createPreviewCard(file, dataUrl, width, height, index) {
-      const card = document.createElement("div");
-      card.className = "preview-card";
-      card.dataset.index = index;
-      
-      card.innerHTML = `
-        <div class="preview-img-container">
-          <img src="${dataUrl}" alt="${file.name}" />
-        </div>
-        <div class="file-meta">
-          <span><strong>${file.name}</strong></span>
-          <span>${(file.size / 1024).toFixed(2)} KB</span>
-          <span>${width} × ${height} px</span>
-        </div>
-        <div class="file-actions">
-          <button class="remove-btn">
-            <i class="fas fa-times"></i> Remove
-          </button>
-          <button class="convert-btn">
-            <i class="fas fa-magic"></i> Convert
-          </button>
-        </div>
-      `;
-      
-      // Add event listeners to the buttons
-      card.querySelector('.remove-btn').addEventListener('click', () => removeFile(index));
-      card.querySelector('.convert-btn').addEventListener('click', () => convertSingle(index));
-      
-      return card;
-    }
+function createPreviewCard(file, dataUrl, width, height, index) {
+  const card = document.createElement("div");
+  card.className = "preview-card";
+  card.dataset.index = index;
+  
+  // Get file extension
+  const fileExt = file.name.split('.').pop().toLowerCase();
+  
+  card.innerHTML = `
+    <div class="preview-img-container">
+      <img src="${dataUrl}" alt="${file.name}" />
+      <span class="file-format-badge">${fileExt}</span>
+    </div>
+    <div class="file-meta">
+      <span><strong>${file.name}</strong></span>
+      <span>${(file.size / 1024).toFixed(2)} KB</span>
+      <span>${width} × ${height} px</span>
+    </div>
+    <div class="file-actions">
+      <button class="remove-btn">
+        <i class="fas fa-times"></i> Remove
+      </button>
+      <button class="convert-btn">
+        <i class="fas fa-magic"></i> Convert
+      </button>
+    </div>
+  `;
+  
+  // Add event listeners to the buttons
+  card.querySelector('.remove-btn').addEventListener('click', () => removeFile(index));
+  card.querySelector('.convert-btn').addEventListener('click', () => convertSingle(index));
+  
+  return card;
+}
 
     function removeFile(index) {
       files.splice(index, 1);
@@ -874,42 +1184,45 @@
     }
 
     function updateConvertedCard(index, convertedData, isPreview = false) {
-      const card = document.querySelector(`.preview-card[data-index="${index}"]`);
-      if (!card) return;
-      
-      card.classList.add("converted-item");
-      
-      const originalSizeKB = files[index].size / 1024;
-      const sizeDiff = ((convertedData.size - originalSizeKB) / originalSizeKB) * 100;
-      const sizeChangeText = sizeDiff < 0 ? 
-        `${Math.abs(sizeDiff).toFixed(1)}% smaller` : 
-        `${sizeDiff.toFixed(1)}% larger`;
-      
-      const actionText = isPreview ? "Preview" : "Converted";
-      
-      card.innerHTML = `
-        <div class="preview-img-container">
-          <img src="${convertedData.dataUrl}" alt="${convertedData.filename}" />
-        </div>
-        <div class="file-meta">
-          <span><strong>${convertedData.filename}</strong></span>
-          <span>${convertedData.size.toFixed(2)} KB (${sizeChangeText})</span>
-          <span>${convertedData.width} × ${convertedData.height} px</span>
-          <span class="file-status"><i class="fas fa-check-circle"></i> ${actionText} to ${convertedData.format.toUpperCase()}</span>
-        </div>
-        <div class="file-actions">
-          <button class="remove-btn">
-            <i class="fas fa-times"></i> Remove
-          </button>
-          <a class="download-btn" href="${convertedData.dataUrl}" download="${convertedData.filename}">
-            <i class="fas fa-download"></i> Download
-          </a>
-        </div>
-      `;
-      
-      // Add event listener to the remove button
-      card.querySelector('.remove-btn').addEventListener('click', () => removeFile(index));
-    }
+  const card = document.querySelector(`.preview-card[data-index="${index}"]`);
+  if (!card) return;
+  
+  card.classList.add("converted-item");
+  
+  const originalSizeKB = files[index].size / 1024;
+  const sizeDiff = ((convertedData.size - originalSizeKB) / originalSizeKB) * 100;
+  const sizeChangeText = sizeDiff < 0 ? 
+    `${Math.abs(sizeDiff).toFixed(1)}% smaller` : 
+    `${sizeDiff.toFixed(1)}% larger`;
+  
+  const actionText = isPreview ? "Preview" : "Converted";
+  
+  card.innerHTML = `
+    <div class="preview-img-container">
+      <img src="${convertedData.dataUrl}" alt="${convertedData.filename}" />
+      <span class="file-format-badge" style="background: ${isPreview ? 'var(--warning)' : 'var(--success)'}; color: var(--bg-primary);">
+        ${convertedData.format}
+      </span>
+    </div>
+    <div class="file-meta">
+      <span><strong>${convertedData.filename}</strong></span>
+      <span>${convertedData.size.toFixed(2)} KB (${sizeChangeText})</span>
+      <span>${convertedData.width} × ${convertedData.height} px</span>
+      <span class="file-status"><i class="fas fa-check-circle"></i> ${actionText} to ${convertedData.format.toUpperCase()}</span>
+    </div>
+    <div class="file-actions">
+      <button class="remove-btn">
+        <i class="fas fa-times"></i> Remove
+      </button>
+      <a class="download-btn" href="${convertedData.dataUrl}" download="${convertedData.filename}">
+        <i class="fas fa-download"></i> Download
+      </a>
+    </div>
+  `;
+  
+  // Add event listener to the remove button
+  card.querySelector('.remove-btn').addEventListener('click', () => removeFile(index));
+}
 
     function downloadAll() {
       if (convertedFiles.length === 0) {
@@ -946,5 +1259,3 @@
   </script>
 </body>
 </html>
-
-
